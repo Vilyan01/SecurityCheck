@@ -1,5 +1,7 @@
+package housestuff;
+
 public class Door {
-  	private String name;
+		private String name;
 		private boolean secured;
 		
 		public Door(String name) {

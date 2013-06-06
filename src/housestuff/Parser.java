@@ -6,6 +6,7 @@ import java.util.Scanner;
 public class Parser {
 	private CommandWords commands;
 	private Scanner reader;
+	private Scanner tokenizer;
 	
 	public Parser() {
 		commands = new CommandWords();
@@ -17,11 +18,11 @@ public class Parser {
 		String word1 = null;
 		String word2 = null;
 		
-		System.out.println("> ");
+		System.out.print("> ");
 		
 		inputLine = reader.nextLine();
 		
-		Scanner tokenizer = new Scanner(inputLine);
+		tokenizer = new Scanner(inputLine);
 		if(tokenizer.hasNext()) {
 			word1 = tokenizer.next();
 			if(tokenizer.hasNext()) {

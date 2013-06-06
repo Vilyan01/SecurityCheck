@@ -1,6 +1,7 @@
+package housestuff;
 import java.util.ArrayList;
 public class House {
-  private int totalPeople;
+	private int totalPeople;
 	private String name;
 	private ArrayList<Door> doors;
 	private ArrayList<Window> windows;
@@ -45,19 +46,33 @@ public class House {
 		this.name = name;
 	}
 	
-	public void addWindows(int windowNumber) {
-		for(int i = 0; i < windowNumber; i++) {
-			String name = "" + i;
-			Window window = new Window(name);
-			windows.add(window);
-		}
+	public void addWindows(String windowName) {
+		Window window = new Window(windowName);
+		windows.add(window);
 	}
 	
-	public void addDoors(int doorNumber) {
-		for(int i = 0; i < doorNumber; i++) {
-			String name = "" + i;
-			Door door = new Door(name);
-			doors.add(door);
+	public void addDoor(String doorName) {
+		Door door = new Door(doorName);
+		doors.add(door);
 		}
+	
+	public Door openDoor(String doorName) {
+		Door desiredDoor = null;
+		for(Door door : doors) {
+			if(door.getName().equals(doorName)) {
+				desiredDoor = door;
+			}
+		}
+		return desiredDoor;
+	}
+	
+	public Window openWindow(String windowName) {
+		Window desiredWindow = null;
+		for(Window window : windows) {
+			if(window.getName().equals(windowName)) {
+				desiredWindow = window;
+			}
+		}
+		return desiredWindow;
 	}
 }
