@@ -57,17 +57,17 @@ public class Driver {
 			checkSecurity();
 			break;
 			
-		//case OPEN:
-			//open(command);
-			//break;
+		case OPEN:
+			open(command);
+			break;
 		
-		//case CLOSE:
-			//close(command);
-			//break;
+		case CLOSE:
+			close(command);
+			break;
 			
-		//case ADD:
-			//add(command);
-			//break;
+		case ADD:
+			add(command);
+			break;
 		}
 		return wantToQuit;
 	}
@@ -88,8 +88,78 @@ public class Driver {
 	}
 	
 	private void checkSecurity() {
-		System.out.println("Unsecured doors: " + house.checkDoors().toString());
-		System.out.println("Unsecured windows: " + house.checkWindows().toString());
+		System.out.println("Unsecured doors: " + house.checkDoors());
+		System.out.println("Unsecured windows: " + house.checkWindows());
+	}
+	
+	
+	private void add(Command command) {
+		if(command.getSecondWord().equals("door")) {
+			if(command.hasThirdWord()) {
+				house.addDoor(command.getThirdWord());
+				System.out.println("Door successfully added.");
+			}
+			else {
+				System.out.println("Must enter a name for the door.");
+			}
+		}
+		else if(command.getSecondWord().equals("window")) {
+			if(command.hasThirdWord()) {
+				house.addWindows(command.getThirdWord());
+				System.out.println("Window successfully added.");
+			}
+		}
+		else {
+			System.out.println("You can't add that.  Current version only allows for doors and windows to be added.");
+		}
+	}
+	
+	public void open(Command command) {
+		if(command.hasSecondWord()) {
+			if(command.getSecondWord().equals("door")) {
+				if(command.hasThirdWord()) {
+					house.openDoor(command.getThirdWord());
+				}
+				else {
+					System.out.println("Must enter a name for the door.  Example: open door door1");
+				}
+			}
+			else if(command.getSecondWord().equals("window")) {
+				if(command.hasThirdWord()) {
+					house.openWindow(command.getThirdWord());
+				}
+				else {
+					System.out.println("Must enter a name for the window.  Example:  open window window1");
+				}
+			}
+		}
+		else {
+			System.out.println("You royally fucked it up.  Example:  open door door1");
+		}
+	}
+		
+		
+	
+	public void close(Command command) {
+		if(command.getSecondWord().equals("door")) {
+			if(command.hasThirdWord()) {
+				house.closeDoor(command.getThirdWord());
+			}
+			else {
+				System.out.println("Must enter door name.  Example: close door door1");
+			}
+		}
+		else if(command.getSecondWord().equals("window")) {
+			if(command.hasThirdWord()) {
+				house.closeWindow(command.getThirdWord());
+			}
+			else {
+				System.out.println("Must enter a window name.  Example:  close window window1");
+			}
+		}
+		else {
+			System.out.println("You fucked it up.  Example:  close <window/door> <doorname>");
+		}
 	}
 	
 	public static void main(String[] args) {

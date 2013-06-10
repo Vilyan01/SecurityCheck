@@ -18,24 +18,26 @@ public class House {
 	}
 	
 	
-	public ArrayList<Door> checkDoors() {
-		ArrayList<Door> unsecuredDoors = new ArrayList<>();
+	public String checkDoors() {
+		String doorNames = "";
 			for(Door d : doors) {
 				if (d.isSecured() == false) {
-					unsecuredDoors.add(d);
+					doorNames += (d.getName() + " ");
 				}
 			}
-		return unsecuredDoors;
+		return doorNames;
 	}
 	
-	public ArrayList<Window> checkWindows() {
-		ArrayList<Window> unsecuredWindows = new ArrayList<>();
+	public String checkWindows() {
+		String windowNames = "";
 		for(Window w : windows) {
 			if(w.isSecured() == false) {
-				unsecuredWindows.add(w);
+				windowNames += (w.getName() + " ");
 			}
 		}
-		return unsecuredWindows;
+		
+		
+		return windowNames;
 	}
 
 	public String getName() {
@@ -56,23 +58,99 @@ public class House {
 		doors.add(door);
 		}
 	
-	public Door openDoor(String doorName) {
-		Door desiredDoor = null;
-		for(Door door : doors) {
-			if(door.getName().equals(doorName)) {
-				desiredDoor = door;
+	
+	public Door findDoor(String doorName) {
+		Boolean finished = false;
+		Door searchDoor = null;
+		int i = 0;
+		while(!finished && i < doors.size()) {
+			String door = doors.get(i).getName();
+			if (door.equals(doorName)) {
+				searchDoor = doors.get(i);
+				finished = true;
 			}
+			i++;
 		}
-		return desiredDoor;
+		return searchDoor;
 	}
 	
-	public Window openWindow(String windowName) {
-		Window desiredWindow = null;
-		for(Window window : windows) {
-			if(window.getName().equals(windowName)) {
-				desiredWindow = window;
+	public Window findWindow(String windowName) {
+		Boolean finished = false;
+		Window searchWindow = null;
+		int i = 0;
+		while(!finished && i < windows.size()) {
+			String window = windows.get(i).getName();
+			if(window.equals(windowName)) {
+				searchWindow = windows.get(i);
+				finished = true;
+			}
+			i++;
+		}
+		return searchWindow;
+	}
+	
+	public void openDoor(String doorName) {
+		Door d = findDoor(doorName);
+		if(d != null) {
+			if(d.isSecured() == true) {
+				d.open();
+				System.out.println(doorName + " opened.");
+			}
+			else {
+				System.out.println(doorName + " is already open.");
 			}
 		}
-		return desiredWindow;
+		else {
+			System.out.println(doorName + " not found.");
+		}
+			
+	}
+	
+	public void closeDoor(String doorName) {
+		Door d = findDoor(doorName);
+		if(d != null) {
+			if(d.isSecured() == false) {
+				d.close();
+				System.out.println(doorName + " closed.");
+			}
+			else {
+				System.out.println(doorName + " is already closed.");
+			}
+		}
+		else {
+			System.out.println("Cannot find " + doorName);
+		}
+	}
+
+	public void openWindow(String windowName) {
+		Window w = findWindow(windowName);
+		if (w != null) {
+			if(w.isSecured()) {
+				w.open();
+				System.out.println(windowName + " opened.");
+			}
+			else {
+				System.out.println(windowName + " is already open!");
+			}
+		}
+		else {
+			System.out.println("Cannot find " + windowName);
+		}
+	}
+	
+	public void closeWindow(String windowName) {
+		Window w = findWindow(windowName);
+		if(w != null) {
+			if(w.isSecured() == false) {
+				w.close();
+				System.out.println(windowName + " closed.");
+			}
+			else {
+				System.out.println(windowName + " already closed!");
+			}
+		}
+		else {
+			System.out.println("Cannot find " + windowName);
+		}
 	}
 }
