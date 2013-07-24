@@ -1,22 +1,31 @@
 package housestuff;
+
+import java.util.*;
+
 /**
- * Driver stuff will go here, so I can actually run the program.  I will deal with this tomorrow.
- * The Parser is still giving me issues, saying the Scanner instance "tokenizer" was never closed.
+ * 
+ * Still deciding whether I want to change make the GUI class my new driver, somehow get both
+ * work together so they can modify each other.
  * 
  * @author Brian
  *
  */
 public class Driver {
 	private Parser parser;
-	private House house;
+	private House currentHouse;
+	private ArrayList<House> houses;
 	
 	public Driver() {
 		parser = new Parser();
-		house = new House("House1");
+		houses = new ArrayList<>();
 	}
 	
 	public void start() {
 		printWelcome();
+		
+		House h = new House("house1");
+		houses.add(h);
+		currentHouse = h;
 		
 		boolean finished = false;
 		while(!finished) {
@@ -68,6 +77,10 @@ public class Driver {
 		case ADD:
 			add(command);
 			break;
+		
+		case CHANGE:
+			change(command);
+			break;
 		}
 		return wantToQuit;
 	}
@@ -88,15 +101,15 @@ public class Driver {
 	}
 	
 	private void checkSecurity() {
-		System.out.println("Unsecured doors: " + house.checkDoors());
-		System.out.println("Unsecured windows: " + house.checkWindows());
+		System.out.println("Unsecured doors: " + currentHouse.checkDoors());
+		System.out.println("Unsecured windows: " + currentHouse.checkWindows());
 	}
 	
 	
 	private void add(Command command) {
 		if(command.getSecondWord().equals("door")) {
 			if(command.hasThirdWord()) {
-				house.addDoor(command.getThirdWord());
+				currentHouse.addDoor(command.getThirdWord());
 				System.out.println("Door successfully added.");
 			}
 			else {
@@ -105,8 +118,18 @@ public class Driver {
 		}
 		else if(command.getSecondWord().equals("window")) {
 			if(command.hasThirdWord()) {
-				house.addWindows(command.getThirdWord());
+				currentHouse.addWindows(command.getThirdWord());
 				System.out.println("Window successfully added.");
+			}
+		}
+		else if(command.getSecondWord().equals("house")) {
+			if(command.hasThirdWord()) {
+				House h = new House(command.getThirdWord());
+				houses.add(h);
+				System.out.println(command.getThirdWord() + " added.");
+			}
+			else {
+				System.out.println("Add a name for your house.");
 			}
 		}
 		else {
@@ -118,7 +141,7 @@ public class Driver {
 		if(command.hasSecondWord()) {
 			if(command.getSecondWord().equals("door")) {
 				if(command.hasThirdWord()) {
-					house.openDoor(command.getThirdWord());
+					currentHouse.openDoor(command.getThirdWord());
 				}
 				else {
 					System.out.println("Must enter a name for the door.  Example: open door door1");
@@ -126,7 +149,7 @@ public class Driver {
 			}
 			else if(command.getSecondWord().equals("window")) {
 				if(command.hasThirdWord()) {
-					house.openWindow(command.getThirdWord());
+					currentHouse.openWindow(command.getThirdWord());
 				}
 				else {
 					System.out.println("Must enter a name for the window.  Example:  open window window1");
@@ -143,7 +166,7 @@ public class Driver {
 	public void close(Command command) {
 		if(command.getSecondWord().equals("door")) {
 			if(command.hasThirdWord()) {
-				house.closeDoor(command.getThirdWord());
+				currentHouse.closeDoor(command.getThirdWord());
 			}
 			else {
 				System.out.println("Must enter door name.  Example: close door door1");
@@ -151,7 +174,7 @@ public class Driver {
 		}
 		else if(command.getSecondWord().equals("window")) {
 			if(command.hasThirdWord()) {
-				house.closeWindow(command.getThirdWord());
+				currentHouse.closeWindow(command.getThirdWord());
 			}
 			else {
 				System.out.println("Must enter a window name.  Example:  close window window1");
@@ -161,6 +184,39 @@ public class Driver {
 			System.out.println("You fucked it up.  Example:  close <window/door> <doorname>");
 		}
 	}
+	
+	public House findHouse(String houseName) {
+		House selectedHouse = null;
+		boolean finished = false;
+		int i = 0;
+		while(!finished) {
+			House h = houses.get(i);
+			if(h.getName().equals(houseName)) {
+				finished = true;
+				selectedHouse = houses.get(i);
+			}
+			i++;
+		}
+		
+		return selectedHouse;
+	}
+	
+	public void change(Command command) {
+		if(command.hasSecondWord()) {
+			House h = findHouse(command.getSecondWord());
+			if(h != null) {
+				currentHouse = h;
+				System.out.println("House changed to " + currentHouse.getName());
+			}
+			else {
+				System.out.println("Cannot find the house you were looking for.");
+			}
+		}
+		else {
+			System.out.println("Please enter the name of the house you are looking for.  Example: change house1");
+		}
+	}
+	
 	
 	public static void main(String[] args) {
 		Driver d = new Driver();

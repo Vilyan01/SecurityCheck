@@ -1,7 +1,7 @@
 package housestuff;
 
 public enum CommandWord {
-	HELP("help"), UNKNOWN("?"), CHECK("check"), OPEN("open"), CLOSE("close"), CREATE("create"), ADD("add"), QUIT("quit");
+	HELP("help"), UNKNOWN("?"), CHECK("check"), OPEN("open"), CLOSE("close"), ADD("add"), QUIT("quit"), CHANGE("change");
 
 	private String commandString;
 	
