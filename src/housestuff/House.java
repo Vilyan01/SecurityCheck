@@ -1,16 +1,19 @@
 package housestuff;
+
 import java.util.ArrayList;
 public class House {
 	private int totalPeople;
 	private String name;
 	private ArrayList<Door> doors;
 	private ArrayList<Window> windows;
+	public ArrayList<Camera> cameras;
 	
 	public House(String address) {
 		setName(address);
 		totalPeople = 0;
 		doors = new ArrayList<>();
 		windows = new ArrayList<>();
+		cameras = new ArrayList<>();
 	}
 	
 	public int getNumberOfPeople() {
@@ -58,6 +61,10 @@ public class House {
 		doors.add(door);
 		}
 	
+	public void addCamera(String cameraName) {
+		Camera camera = new Camera(cameraName);
+		cameras.add(camera);
+	}
 	
 	public Door findDoor(String doorName) {
 		Boolean finished = false;
@@ -89,68 +96,87 @@ public class House {
 		return searchWindow;
 	}
 	
-	public void openDoor(String doorName) {
+	public String openDoor(String doorName) {
 		Door d = findDoor(doorName);
 		if(d != null) {
 			if(d.isSecured() == true) {
 				d.open();
-				System.out.println(doorName + " opened.");
+				return (doorName + " opened.");
 			}
 			else {
-				System.out.println(doorName + " is already open.");
+				return (doorName + " is already open.");
 			}
 		}
 		else {
-			System.out.println(doorName + " not found.");
+			return (doorName + " not found.");
 		}
 			
 	}
 	
-	public void closeDoor(String doorName) {
+	public String closeDoor(String doorName) {
 		Door d = findDoor(doorName);
 		if(d != null) {
 			if(d.isSecured() == false) {
 				d.close();
-				System.out.println(doorName + " closed.");
+				return (doorName + " closed.");
 			}
 			else {
-				System.out.println(doorName + " is already closed.");
+				return (doorName + " is already closed.");
 			}
 		}
 		else {
-			System.out.println("Cannot find " + doorName);
+			return ("Cannot find " + doorName);
 		}
 	}
 
-	public void openWindow(String windowName) {
+	public String openWindow(String windowName) {
 		Window w = findWindow(windowName);
 		if (w != null) {
 			if(w.isSecured()) {
 				w.open();
-				System.out.println(windowName + " opened.");
+				return (windowName + " opened.");
 			}
 			else {
-				System.out.println(windowName + " is already open!");
+				return (windowName + " is already open!");
 			}
 		}
 		else {
-			System.out.println("Cannot find " + windowName);
+			return ("Cannot find " + windowName);
 		}
 	}
 	
-	public void closeWindow(String windowName) {
+	public String closeWindow(String windowName) {
 		Window w = findWindow(windowName);
 		if(w != null) {
 			if(w.isSecured() == false) {
 				w.close();
-				System.out.println(windowName + " closed.");
+				return (windowName + " closed.");
 			}
 			else {
-				System.out.println(windowName + " already closed!");
+				return (windowName + " already closed!");
 			}
 		}
 		else {
-			System.out.println("Cannot find " + windowName);
+			return ("Cannot find " + windowName);
 		}
+	}
+	
+	public Camera findCamera(String searchString) {
+		boolean finished = false;
+		Camera searchCamera = null;
+		int i = 0;
+		while(!finished && i < cameras.size()) {
+			String camera = cameras.get(i).getName();
+			if(camera.equals(searchString)) {
+				searchCamera = cameras.get(i);
+				finished = true;
+			}
+			i++;
+		}
+		return searchCamera;
+	}
+	
+	public ArrayList<Camera> getCameras() {
+		return cameras;
 	}
 }

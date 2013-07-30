@@ -1,4 +1,5 @@
 package housestuff;
+
 import java.util.HashMap;
 public class CommandWords {
 	
@@ -27,10 +28,11 @@ public class CommandWords {
 		return validCommands.containsKey(aString);		
 	}
 	
-	public void showAll() {
+	public String showAll() {
+		String commandWords = "";
 		for(String command : validCommands.keySet()) {
-			System.out.print(command + " ");
+			commandWords += (command + " ");
 		}
-		System.out.println();
+		return commandWords;
 	}
 }
