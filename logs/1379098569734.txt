@@ -1,0 +1,13 @@
+Welcome to SecurityCheck!  Type 'help' for a list of commands.
+[2013-09-13 11:54:44.856] doro1 successfully added.
+[2013-09-13 11:54:47.899] window1 successfully added.
+[2013-09-13 11:54:52.198] camera1 successfully added.
+[2013-09-13 11:54:57.398] camera2 successfully added.
+[2013-09-13 11:55:03.147] door1 not found.
+[2013-09-13 11:55:06.598] doro1 opened.
+[2013-09-13 11:55:41.41] Unsecured doors: doro1 
+Unsecured windows: 
+[2013-09-13 11:55:50.094] doro1 closed.
+[2013-09-13 11:55:54.419] Security Mode Enabled
+[2013-09-13 11:56:03.948] window1 opened.
+Alarm Sounded!

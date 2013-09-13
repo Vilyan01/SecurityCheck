@@ -1,7 +1,7 @@
 package housestuff;
 
 /**
- * I AM ALL THAT IS MAN!  Just implement the open/close for windows.
+ * Login screen and users/database are next...
  */
 
 import java.awt.EventQueue;
@@ -12,7 +12,10 @@ import javax.swing.border.BevelBorder;
 import javax.swing.tree.*;
 
 import java.awt.SystemColor;
+import java.util.Date;
+import java.sql.Timestamp;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -30,12 +33,16 @@ import javax.swing.JTextArea;
 import javax.swing.JTree;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
+
+
 
 public class GUI {
 	
 	private Scanner reader;
 	private CommandWords commands;
 	private Scanner tokenizer;
+	private LoggingUtility logger;
 
 	private JFrame frame;
 	private JTextField textField;
@@ -46,8 +53,10 @@ public class GUI {
 	
 	private DefaultMutableTreeNode doors, windows;
 	private DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("House");
-	
 	private DefaultMutableTreeNode cameraRoot = new DefaultMutableTreeNode("Cameras");
+	
+	private boolean secMode = false;
+	private Alarm al;
 	
 	private static final String VERSION = "0.02";
 
@@ -79,6 +88,8 @@ public class GUI {
 	 */
 	private void initialize() {
 		currentHouse = new House("My House");
+		al = new Alarm();
+		logger = new LoggingUtility();
 		
 		frame = new JFrame();
 		frame.setTitle("SecurityCheck");
@@ -97,8 +108,39 @@ public class GUI {
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
 		
+		JMenu mnOptions = new JMenu("Options");
+		menuBar.add(mnOptions);
+		
+		JCheckBoxMenuItem mntmSecurityMode = new JCheckBoxMenuItem("Toggle Sec-Mode");
+		mntmSecurityMode.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(secMode == false) {
+					secMode = true;
+					textArea.append("\n" + getTimeStamp() + "Security Mode Enabled");
+				}
+				else if(secMode == true) {
+					secMode = false;
+					textArea.append("\n" + getTimeStamp() + "Security Mode Disabled");
+				}
+			}
+		});
+		mnOptions.add(mntmSecurityMode);
+		
 		JMenuItem mntmAutodetect = new JMenuItem("Auto-Detect...");
 		mnFile.add(mntmAutodetect);
+		
+		JMenuItem mntmLog = new JMenuItem("Save Log");
+		mnFile.add(mntmLog);
+		mntmLog.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					logger.writeAndSave(textArea);
+					JOptionPane.showMessageDialog(frame, "Log " + logger.getLastSavedLog() + " created.");
+				} catch (IOException e) {
+					JOptionPane.showMessageDialog(frame, "Error:  Could not save log.");
+				}
+			}
+		});
 		
 		JSeparator separator = new JSeparator();
 		mnFile.add(separator);
@@ -235,27 +277,27 @@ public class GUI {
 		CommandWord commandWord = command.getCommandWord();
 		switch(commandWord) {
 		case UNKNOWN:
-			output = "Command is not valid.";
+			output = getTimeStamp() + "Command is not valid.";
 			break;
 		
 		case HELP:
-			output = showHelp();
+			output = getTimeStamp() + showHelp();
 			break;
 			
 		case CHECK:
-			output = checkSecurity();
+			output = getTimeStamp() + checkSecurity();
 			break;
 			
 		case OPEN:
-			output = open(command);
+			output = getTimeStamp() + open(command);
 			break;
 		
 		case CLOSE:
-			output = close(command);
+			output = getTimeStamp() + close(command);
 			break;
 			
 		case ADD:
-			output = add(command);
+			output = getTimeStamp() + add(command);
 			break;
 		}
 		return output;				
@@ -269,7 +311,7 @@ public class GUI {
 					currentHouse.addDoor(command.getThirdWord());
 					addAFile(command.getThirdWord(), doors);
 					refreshTree(tree);
-					output = ("Door successfully added.");
+					output = (command.getThirdWord() + " successfully added.");
 				}
 				else {
 					output = ("Must enter a name for the door.");
@@ -280,7 +322,7 @@ public class GUI {
 					currentHouse.addWindows(command.getThirdWord());
 					addAFile(command.getThirdWord(), windows);
 					refreshTree(tree);
-					output = ("Window successfully added.");
+					output = (command.getThirdWord() + " successfully added.");
 				}
 			}
 			else if(command.getSecondWord().equals("camera")) {
@@ -288,14 +330,14 @@ public class GUI {
 					currentHouse.addCamera(command.getThirdWord());
 					addAFile(command.getThirdWord(), cameraRoot);
 					refreshTree(cameraList);
-					output = ("Camera successfully added.");
+					output = (command.getThirdWord() + " successfully added.");
 				}
 				else {
-					output = "Example: add door door1";
+					output = "Must enter a name for the camera.";
 				}
 			}
 			else {
-				output = ("You can't add that.  Current version only allows for doors and windows to be added.");
+				output = ("You can't add that.  Current version only allows for doors, windows, and cameras to be added.");
 			}
 		}
 		else {
@@ -316,24 +358,26 @@ public class GUI {
 
 	private String close(Command command) {
 		String output = null;
-		if(command.getSecondWord().equals("door")) {
-			if(command.hasThirdWord()) {
-				changeDoorNodeName("(" + command.getThirdWord() + ")", command.getThirdWord());
-				output = currentHouse.closeDoor(command.getThirdWord());
-				refreshTree(tree);
+		if(command.hasSecondWord()) {
+			if(command.getSecondWord().equals("door")) {
+				if(command.hasThirdWord()) {
+					changeDoorNodeName("(" + command.getThirdWord() + ")", command.getThirdWord());
+					output = currentHouse.closeDoor(command.getThirdWord());
+					refreshTree(tree);
+				}
+				else {
+					output = ("Must enter door name.  Example: close door door1");
+				}
 			}
-			else {
-				output = ("Must enter door name.  Example: close door door1");
-			}
-		}
-		else if(command.getSecondWord().equals("window")) {
-			if(command.hasThirdWord()) {
-				changeWindowNodeName("(" + command.getThirdWord() + ")", command.getThirdWord());
-				output = currentHouse.closeWindow(command.getThirdWord());
-				refreshTree(tree);
-			}
-			else {
-				output = ("Must enter a window name.  Example:  close window window1");
+			else if(command.getSecondWord().equals("window")) {
+				if(command.hasThirdWord()) {
+					changeWindowNodeName("(" + command.getThirdWord() + ")", command.getThirdWord());
+					output = currentHouse.closeWindow(command.getThirdWord());
+					refreshTree(tree);
+				}
+				else {
+					output = ("Must enter a window name.  Example:  close window window1");
+				}
 			}
 		}
 		else {
@@ -349,6 +393,10 @@ public class GUI {
 				if(command.hasThirdWord()) {
 					output = currentHouse.openDoor(command.getThirdWord());
 					changeDoorNodeName(command.getThirdWord(), "(" + command.getThirdWord() + ")");
+					if (secMode == true) {
+						soundAlarm();
+						output += "\nAlarm Sounded!";
+					}
 					refreshTree(tree);
 				}
 				else {
@@ -360,6 +408,10 @@ public class GUI {
 					output = currentHouse.openWindow(command.getThirdWord());
 					changeWindowNodeName(command.getThirdWord(), "(" + command.getThirdWord() + ")");
 					refreshTree(tree);
+					if(secMode == true) {
+						soundAlarm();
+						output += "\nAlarm Sounded!";
+					}
 				}
 				else {
 					output = ("Must enter a name for the window.  Example:  open window window1");
@@ -370,6 +422,25 @@ public class GUI {
 			output = ("You royally fucked it up.  Example:  open door door1");
 		}
 		return output;
+	}
+
+	private void soundAlarm() {
+		if(al.getFile() != null) {
+			al.playAlarm();
+		}
+		else {
+			JOptionPane.showMessageDialog(frame, "Warning:  Alarm sound is not available.");
+		}
+		
+	}
+	
+	private String getTimeStamp() {
+		String timeStamp = null;
+		Date date = new Date();
+		Timestamp t = new Timestamp(date.getTime());
+		timeStamp = "[" + t.toString() + "] ";
+		
+		return timeStamp;
 	}
 
 	private void changeWindowNodeName(String windowName, String newName) {
@@ -397,8 +468,7 @@ public class GUI {
 			node.setUserObject(newName);
 		}
 	}
-
-
+	
 	private DefaultMutableTreeNode findDoorNode(String doorName) {
 		DefaultTreeModel model = (DefaultTreeModel)tree.getModel();
 		DefaultMutableTreeNode node = null;
@@ -412,8 +482,13 @@ public class GUI {
 	}
 
 	private String checkSecurity() {
-		return "Unsecured doors: " + currentHouse.checkDoors() + "\n" +
+		String securityString = "Unsecured doors: " + currentHouse.checkDoors() + "\n" +
 				"Unsecured windows: " + currentHouse.checkWindows();
+		if(secMode == true) {
+			securityString += "\nSecurity Mode is enabled";
+		}
+		
+		return securityString;
 	}
 
 	private String showHelp() {
